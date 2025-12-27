@@ -28,8 +28,8 @@ def create_app():
     # allow cors
     CORS(
         app,
-        resource={r"/api/*": ["http://localhost:3000", "http://127.0.0.1:3000"]},
-        support_credentials=True,
+        resource={r"/api/*": ["http://localhost:3000", "http://127.0.0.1:3000", "https://cuynotes.up.railway.app"]},
+        supports_credentials=True,
         methods=["GET", "POST", "PUT", "DELETE"],
         allow_headers=["Content-type", "Authorization", "X-CSRF-token"],
         expose_headers=["Content-type"],
