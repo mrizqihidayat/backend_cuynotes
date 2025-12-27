@@ -7,7 +7,7 @@ from datetime import timedelta
 load_dotenv()
 
 def mysql_uri() -> str:
-    user = os.getenv("DB_USER", "rizqi")
+    user = os.getenv("DB_USER", "root")
     password = os.getenv("DB_PASSWORD", "123")
     host = os.getenv("DB_HOST", "mysql.railway.internal")
     db_name = os.getenv("DB_NAME", "railway")
