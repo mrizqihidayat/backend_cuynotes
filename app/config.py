@@ -8,12 +8,16 @@ load_dotenv()
 
 def mysql_uri() -> str:
     user = os.getenv("DB_USER", "root")
-    password = os.getenv("DB_PASSWORD", "")
-    host = os.getenv("DB_HOST", "mysql.railway.internal") 
-    db_name = os.getenv("DB_NAME", "railway") 
+    password = os.getenv("DB_PASSWORD", "") # Pastikan variabel ini tidak kosong di Railway
+    host = os.getenv("DB_HOST", "mysql.railway.internal")
+    db_name = os.getenv("DB_NAME", "railway")
     db_port = os.getenv("DB_PORT", "3306")
 
-    return (f"mysql+pymysql://{user}:{password}@{host}:{db_port}/{db_name}")
+    # Debugging sederhana (akan muncul di log Railway saat startup)
+    if not password:
+        print("WARNING: DB_PASSWORD is empty!")
+
+    return f"mysql+pymysql://{user}:{password}@{host}:{db_port}/{db_name}"
 
 class Config:
     SQLALCHEMY_DATABASE_URI = mysql_uri()
