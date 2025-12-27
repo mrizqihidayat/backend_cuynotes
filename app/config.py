@@ -7,16 +7,15 @@ from datetime import timedelta
 load_dotenv()
 
 def mysql_uri() -> str:
-    user = os.getenv("DB_USER")
-    password = os.getenv("DB_PASSWORD")
-    host = os.getenv("DB_HOST")
-    db_name = os.getenv("DB_NAME")
-    db_port = os.getenv("DB_PORT")
+    user = os.getenv("DB_USER", "root")
+    password = os.getenv("DB_PASSWORD") # Hapus default "" agar kita tahu jika ini benar-benar tidak terbaca
+    host = os.getenv("DB_HOST", "mysql.railway.internal")
+    db_name = os.getenv("DB_NAME", "railway")
+    db_port = os.getenv("DB_PORT", "3306")
 
-    # Debugging sederhana (akan muncul di log Railway saat startup)
     if not password:
-        print("WARNING: DB_PASSWORD is empty!")
-
+        print("--- DEBUG: PASSWORD TIDAK TERDETEKSI (KOSONG) ---")
+    
     return f"mysql+pymysql://{user}:{password}@{host}:{db_port}/{db_name}"
 
 class Config:
