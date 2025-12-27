@@ -7,11 +7,22 @@ from datetime import timedelta
 load_dotenv()
 
 def mysql_uri() -> str:
-    user = os.getenv("DB_USER", "root")
-    password = os.getenv("DB_PASSWORD", "")
-    host = os.getenv("DB_HOST", "mysql.railway.internal")
-    db_name = os.getenv("DB_NAME", "railway")
-    db_port = os.getenv("DB_PORT", "3306")
+    # Prefer explicit DB_* vars, but support Railway's MYSQL*/RAILWAY_* too
+    user = os.getenv("DB_USER") or os.getenv("MYSQLUSER") or "root"
+    password = (
+        os.getenv("DB_PASSWORD")
+        or os.getenv("MYSQLPASSWORD")
+        or os.getenv("MYSQL_ROOT_PASSWORD")
+        or ""
+    )
+    host = (
+        os.getenv("DB_HOST")
+        or os.getenv("MYSQLHOST")
+        or os.getenv("RAILWAY_PRIVATE_DOMAIN")
+        or "mysql.railway.internal"
+    )
+    db_name = os.getenv("DB_NAME") or os.getenv("MYSQLDATABASE") or os.getenv("MYSQL_DATABASE") or "railway"
+    db_port = os.getenv("DB_PORT") or os.getenv("MYSQLPORT") or "3306"
 
     if not password:
         print("--- DEBUG: PASSWORD TIDAK TERDETEKSI (KOSONG) ---")
@@ -21,6 +32,7 @@ def mysql_uri() -> str:
 class Config:
     SQLALCHEMY_DATABASE_URI = mysql_uri()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
     
     #secret key jwt
     JWT_SECRET_KEY = os.getenv("SECRET_KEY", "123")
@@ -37,4 +49,5 @@ def db_connection():
         connection.close()
         return True
     except OperationalError as e:
+        # Enforce normal behavior: fail fast when DB is unreachable.
         raise RuntimeError(f"Database not connected: {e}")
