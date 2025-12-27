@@ -8,7 +8,7 @@ load_dotenv()
 
 def mysql_uri() -> str:
     user = os.getenv("DB_USER", "root")
-    password = os.getenv("DB_PASSWORD", "") # Pastikan variabel ini tidak kosong di Railway
+    password = os.getenv("DB_PASSWORD", "123") # Pastikan variabel ini tidak kosong di Railway
     host = os.getenv("DB_HOST", "mysql.railway.internal")
     db_name = os.getenv("DB_NAME", "railway")
     db_port = os.getenv("DB_PORT", "3306")
