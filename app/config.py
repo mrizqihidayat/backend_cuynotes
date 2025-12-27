@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.engine import make_url
 from datetime import timedelta
 
 load_dotenv()
@@ -51,6 +52,14 @@ class Config:
 def db_connection():
     uri = Config.SQLALCHEMY_DATABASE_URI
     try:
+        # Log which host/port/database we are trying to reach (without password)
+        try:
+            parsed = make_url(uri)
+            print(
+                f"Connecting to MySQL host={parsed.host} port={parsed.port} db={parsed.database} user={parsed.username}"
+            )
+        except Exception:
+            print("Connecting to MySQL (could not parse URI for logging)")
         engine = create_engine(uri)
         connection = engine.connect()
         print("Database connected")
