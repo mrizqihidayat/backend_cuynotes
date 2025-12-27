@@ -9,29 +9,36 @@ load_dotenv()
 def mysql_uri() -> str:
     user = os.getenv("DB_USER", "root")
     password = os.getenv("DB_PASSWORD", "")
-    host = os.getenv("DB_HOST", "localhost")
-    db_name = os.getenv("DB_NAME", "notes")
-    db_port = os.getenv("DB_PORT", "3306")
+    host = os.getenv("DB_HOST", "mysql.railway.internal")
+    db_name = os.getenv("DB_NAME", "railway")
 
-    return (f"mysql+pymysql://{user}:{password}@{host}:{db_port}/{db_name}")
+    db_port = os.getenv("DB_PORT", "3306")
+    if not db_port:
+        db_port = "3306"
+
+    return f"mysql+pymysql://{user}:{password}@{host}:{db_port}/{db_name}"
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = mysql_uri()
+    @property
+    def SQLALCHEMY_DATABASE_URI(self):
+        return mysql_uri()
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    #secret key jwt
-    JWT_SECRET_KEY = os.getenv("SECRET_KEY", "123")
+    JWT_SECRET_KEY = os.getenv("SECRET_KEY", "rahasia")
 
-    #token expires JWT
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=8)
 
 def db_connection():
-    uri = Config.SQLALCHEMY_DATABASE_URI
+    uri = mysql_uri()
     try:
-        engine = create_engine(uri)
+        # Menambahkan pool_pre_ping agar koneksi ke MySQL Railway lebih stabil
+        engine = create_engine(uri, pool_pre_ping=True)
         connection = engine.connect()
-        print("Database connected")
+        print(f"Database connected to {uri.split('@')[1]}") 
         connection.close()
         return True
-    except OperationalError as e:
+    except Exception as e:
+        # Memberikan pesan error yang lebih detail di log Railway
+        print(f"Connection Failed: {str(e)}")
         raise RuntimeError(f"Database not connected: {e}")
