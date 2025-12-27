@@ -25,14 +25,23 @@ def create_app():
     bcrypt.init_app(app)
     jwt.init_app(app)
 
-    # allow cors
+    # allow cors for dev + prod frontend domains
+    allowed_origins = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://cuynotes.up.railway.app",
+    ]
+
     CORS(
         app,
-        resource={r"/api/*": ["http://localhost:3000", "http://127.0.0.1:3000", "https://cuynotes.up.railway.app"]},
+        resources={
+            r"/api/*": {"origins": allowed_origins},
+            r"/uploads/*": {"origins": allowed_origins},
+        },
         supports_credentials=True,
-        methods=["GET", "POST", "PUT", "DELETE"],
-        allow_headers=["Content-type", "Authorization", "X-CSRF-token"],
-        expose_headers=["Content-type"],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["Content-Type", "Authorization", "X-CSRF-token"],
+        expose_headers=["Content-Type"],
     )
     
     #daftar models
