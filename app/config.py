@@ -7,6 +7,13 @@ from datetime import timedelta
 load_dotenv()
 
 def mysql_uri() -> str:
+    # If Railway provides full URLs, prefer them and normalize scheme
+    full_url = os.getenv("MYSQL_URL") or os.getenv("MYSQL_PUBLIC_URL") or os.getenv("DATABASE_URL")
+    if full_url:
+        if full_url.startswith("mysql://"):
+            full_url = "mysql+pymysql://" + full_url[len("mysql://") :]
+        return full_url
+
     # Prefer explicit DB_* vars, but support Railway's MYSQL*/RAILWAY_* too
     user = os.getenv("DB_USER") or os.getenv("MYSQLUSER") or "root"
     password = (
@@ -19,10 +26,11 @@ def mysql_uri() -> str:
         os.getenv("DB_HOST")
         or os.getenv("MYSQLHOST")
         or os.getenv("RAILWAY_PRIVATE_DOMAIN")
+        or os.getenv("RAILWAY_TCP_PROXY_DOMAIN")
         or "mysql.railway.internal"
     )
     db_name = os.getenv("DB_NAME") or os.getenv("MYSQLDATABASE") or os.getenv("MYSQL_DATABASE") or "railway"
-    db_port = os.getenv("DB_PORT") or os.getenv("MYSQLPORT") or "3306"
+    db_port = os.getenv("DB_PORT") or os.getenv("MYSQLPORT") or os.getenv("RAILWAY_TCP_PROXY_PORT") or "3306"
 
     if not password:
         print("--- DEBUG: PASSWORD TIDAK TERDETEKSI (KOSONG) ---")
