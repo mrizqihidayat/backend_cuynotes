@@ -7,8 +7,8 @@ from datetime import timedelta
 load_dotenv()
 
 def mysql_uri() -> str:
-    user = os.getenv("DB_USER", "root")
-    password = os.getenv("DB_PASSWORD") # Hapus default "" agar kita tahu jika ini benar-benar tidak terbaca
+    user = os.getenv("DB_USER", "rizqi")
+    password = os.getenv("DB_PASSWORD", "123")
     host = os.getenv("DB_HOST", "mysql.railway.internal")
     db_name = os.getenv("DB_NAME", "railway")
     db_port = os.getenv("DB_PORT", "3306")
